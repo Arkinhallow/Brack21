@@ -28,6 +28,8 @@ public class WaveSpawner : MonoBehaviour
     //wave that is coming next
     private int nextWave = 0;
 
+    public Transform[] spawnPoints;
+
     //5 seconds between waves
     public float timeBetweenWaves = 5f;
     //countdown to next wave (=0)
@@ -53,9 +55,8 @@ public class WaveSpawner : MonoBehaviour
             //BEGIN A NEW ROUND/WAVE IF NO ENEMIES ARE LEFT
             if (!EnemyIsAlive())
             {
-                //begin new round
-                Debug.Log ("Wave Completed");
-                return;
+                //RUN THE WAVECOMPLETED METHOD
+                WaveCompleted();
             }
             else
             {
@@ -73,7 +74,7 @@ public class WaveSpawner : MonoBehaviour
             if (state != SpawnState.Spawning)
             {
                 //because the method is an IE, we need to use the StartCoroutine to call it
-                //this code calls the SpawnWave code, and calls the next wave in the waves array
+                //this code calls the SpawnWave code, and calls the index in the waves array that corresponds to the value of nextWave (calls the next wave in the array)
                 StartCoroutine( SpawnWave ( waves[nextWave] ) );
             }
         }
@@ -83,6 +84,30 @@ public class WaveSpawner : MonoBehaviour
             //drops the countdown 1 unit per second 
             //makes the time countdown relevant to actual time and not the number of frames drawn per second
             waveCountdown -= Time.deltaTime;
+        }
+    }
+
+    void WaveCompleted()
+    {
+        Debug.Log ("Wave Completed");
+
+        //SET SPAWNSTATE TO COUNTING
+        state = SpawnState.Counting;
+        //countdown to next wave is going to be set to 5 seconds (as it is at the start)
+        waveCountdown = timeBetweenWaves;
+
+        //IF ALL WAVES HAVE BEEN COMPLETED, LOOP WAVES (GO BACK TO STARTING WAVE)
+        //if the number of waves completed is greater than the number of waves in the waves array, set nextWave (number of waves tracker) to 0, thereby starting the waves over from the start.
+        if (nextWave + 1 > waves.Length - 1)
+        {
+            nextWave = 0;
+            Debug.Log ("Completed All Waves! Looping...");
+            //-----ADD LEVEL FINISH SCREEN HERE-------------------------------------------------------------------------------------------------------------------------
+        }
+        else
+        {
+        //add one to the nextWave value
+        nextWave++;
         }
     }
 
